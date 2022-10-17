@@ -1,5 +1,6 @@
 # %%
 # from functools import cache, lru_cache
+from turtle import color
 from cvzone.HandTrackingModule import HandDetector
 import numpy as np
 import cv2
@@ -10,6 +11,23 @@ import math
 
 CAMERA_PORT = 0
 [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1280, 720, 30]
+
+# Colour constants BGR not RGB
+# POLYLINE_COLOR = (255, 255, 255)  # White line
+# LINE_COLOR = (0, 0, 255) # Red in BGR
+# CIRCLE_COLOR = (255, 0, 0) # Blue in BGR
+
+# * Colors to try out
+# Light Red   (33,28,206)
+# Turquiose   (189,192,38)
+# Light Green (67, 227, 185)
+# Light Orange (243,167,43)
+
+POLYLINE_COLOR = (33, 28, 206)
+LINE_COLOR = (189, 192, 38)
+CIRCLE_COLOR = (67, 227, 185)
+TEXT_COLOR = (255, 255, 255)
+TEXTBOX_COLOR = (243, 167, 43)
 
 
 def initialise_video_capture():
@@ -48,10 +66,13 @@ class SnakeGameClass:
     def update(self, imgMain, currentHead):
 
         if self.gameOver:
-            cvzone.putTextRect(imgMain, "Game Over", [300, 400],
-                               scale=7, thickness=5, offset=20)
-            cvzone.putTextRect(imgMain, f'Your Score: {self.score}', [300, 550],
-                               scale=7, thickness=5, offset=20)
+            cvzone.putTextRect(imgMain, "Press SpaceBar to restart", [50, 80],
+                               scale=3, thickness=3, offset=10, colorT=TEXT_COLOR, colorR=TEXTBOX_COLOR)
+            # TODO add a GameOver tracking the finger
+            cvzone.putTextRect(imgMain, "Game Over", pos=[300, 400],
+                               scale=7, thickness=5, offset=20, colorT=TEXT_COLOR, colorR=TEXTBOX_COLOR)
+            cvzone.putTextRect(imgMain, f'Your Score: {self.score}', pos=[300, 550],
+                               scale=7, thickness=5, offset=20, colorT=TEXT_COLOR, colorR=TEXTBOX_COLOR)
         else:
             px, py = self.previousHead
             cx, cy = currentHead
@@ -85,23 +106,23 @@ class SnakeGameClass:
                 for i, point in enumerate(self.points):
                     if i != 0:
                         cv2.line(
-                            imgMain, self.points[i - 1], self.points[i], (0, 0, 255), 20)
+                            imgMain, self.points[i - 1], self.points[i], LINE_COLOR, 20)
                 cv2.circle(imgMain, self.points[-1],
-                           20, (0, 255, 0), cv2.FILLED)
+                           20, CIRCLE_COLOR, cv2.FILLED)
 
             # Draw Food
             imgMain = cvzone.overlayPNG(imgMain, self.imgFood,
                                         (rx - self.wFood // 2, ry - self.hFood // 2))
 
             cvzone.putTextRect(imgMain, f'Score: {self.score}', [50, 80],
-                               scale=3, thickness=3, offset=10)
+                               scale=3, thickness=3, offset=10, colorT=TEXT_COLOR, colorR=TEXTBOX_COLOR)
 
             # Check for Collision
             pts = np.array(self.points[:-2], np.int32)
             pts = pts.reshape((-1, 1, 2))
-            cv2.polylines(imgMain, [pts], False, (0, 255, 0), 3)
+            cv2.polylines(imgMain, [pts], False,
+                          color=POLYLINE_COLOR, thickness=3)
             minDist = cv2.pointPolygonTest(pts, (cx, cy), True)
-
             if -1 <= minDist <= 1:
                 print("Hit")
                 self.gameOver = True
@@ -121,7 +142,7 @@ class SnakeGameClass:
 FOOD_IMAGE = "eic8.png"
 
 game = SnakeGameClass(FOOD_IMAGE)
-print(game.imgFood is None)
+# print(game.imgFood is None)
 
 # %%
 while True:
@@ -135,5 +156,7 @@ while True:
         img = game.update(img, pointIndex)
     cv2.imshow("Image", img)
     key = cv2.waitKey(1)
-    if key == ord('r'):
+    if key == ord(' '):
         game.gameOver = False
+    # if key == ord(''):
+    #     quit()

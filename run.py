@@ -7,6 +7,7 @@ import cv2
 import cvzone
 import random
 import math
+OKGREEN = '\033[92m'
 
 
 CAMERA_PORT = 0
@@ -145,6 +146,8 @@ game = SnakeGameClass(FOOD_IMAGE)
 # print(game.imgFood is None)
 
 # %%
+
+print('\033[92m' + "The snake game is currently running......" + '\033[0m')
 while True:
     success, img = cap.read()
     img = cv2.flip(img, 1)
@@ -158,5 +161,3 @@ while True:
     key = cv2.waitKey(1)
     if key == ord(' '):
         game.gameOver = False
-    # if key == ord(''):
-    #     quit()

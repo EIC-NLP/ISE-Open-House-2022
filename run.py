@@ -7,7 +7,7 @@ import cv2
 import cvzone
 import random
 import math
-
+print("")
 
 CAMERA_PORT = 0  # 2 for external and 0 fo internal
 # [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1920, 1080, 30]

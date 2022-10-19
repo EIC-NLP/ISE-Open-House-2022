@@ -7,10 +7,10 @@ import cv2
 import cvzone
 import random
 import math
-OKGREEN = '\033[92m'
 
 
-CAMERA_PORT = 0
+CAMERA_PORT = 0  # 2 for external and 0 fo internal
+# [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1920, 1080, 30]
 [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1280, 720, 30]
 
 # Colour constants BGR not RGB
@@ -135,12 +135,13 @@ class SnakeGameClass:
                 self.randomFoodLocation()
 
         return imgMain
-# FOOD_IMAGE = "eic8.png"
+
+
 #! NOTE: The image must be semi-transparent. A mask is required for the image.
 # * AKA no sqaure images only circle or other shapes
 
 
-FOOD_IMAGE = "eic8.png"
+FOOD_IMAGE = "eic.png"
 
 game = SnakeGameClass(FOOD_IMAGE)
 # print(game.imgFood is None)
@@ -158,6 +159,12 @@ while True:
         pointIndex = lmList[8][0:2]
         img = game.update(img, pointIndex)
     cv2.imshow("Image", img)
-    key = cv2.waitKey(1)
-    if key == ord(' '):
+    pressedKey = cv2.waitKey(1) & 0xFF
+    if pressedKey == ord(' '):
         game.gameOver = False
+    elif pressedKey == ord('q'):
+        print('\033[92m' + "The Game is quitting......" + '\033[0m')
+        break
+
+cap.release()
+cv2.destroyAllWindows()

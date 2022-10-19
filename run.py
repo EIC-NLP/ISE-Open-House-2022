@@ -1,16 +1,13 @@
-# %%
-# from functools import cache, lru_cache
-from turtle import color
+
 from cvzone.HandTrackingModule import HandDetector
 import numpy as np
 import cv2
 import cvzone
 import random
 import math
-print("")
 
-CAMERA_PORT = 0  # 2 for external and 0 fo internal
 # [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1920, 1080, 30]
+CAMERA_PORT = 1  # 2 for external and 0 fo internal
 [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1280, 720, 30]
 
 # Colour constants BGR not RGB
@@ -18,11 +15,13 @@ CAMERA_PORT = 0  # 2 for external and 0 fo internal
 # LINE_COLOR = (0, 0, 255) # Red in BGR
 # CIRCLE_COLOR = (255, 0, 0) # Blue in BGR
 
-# * Colors to try out
-# Light Red   (33,28,206)
-# Turquiose   (189,192,38)
-# Light Green (67, 227, 185)
-# Light Orange (243,167,43)
+# Color         (Blue, Green, Red)
+# Light Red     (33  , 28   , 206)
+# Light Blue    (189 , 192  , 38)
+# Light Green   (67  , 227  , 185)
+# Light Orange  (243 , 167  , 43)
+# White         (255 , 255  , 255)
+# Black         (0   , 0    , 0)
 
 POLYLINE_COLOR = (33, 28, 206)
 LINE_COLOR = (189, 192, 38)

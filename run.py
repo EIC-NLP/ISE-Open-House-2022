@@ -10,7 +10,7 @@ import math
 
 print("")
 
-CAMERA_PORT = 0  # 2 for external and 0 fo internal
+CAMERA_PORT = 1  # 2 for external and 0 fo internal
 # [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1920, 1080, 30]
 [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1280, 720, 30]
 
@@ -69,7 +69,8 @@ class SnakeGameClass:
 
         if self.gameOver:
             cvzone.putTextRect(imgMain,
-                               "Press SpaceBar to restart", [50, 80],
+                               "Press SpaceBar or Open Your Hand to restart",
+                               [50, 80],
                                scale=3,
                                thickness=3,
                                offset=10,
@@ -178,14 +179,26 @@ while True:
     success, img = cap.read()
     img = cv2.flip(img, 1)
     hands, img = detector.findHands(img, flipType=False)
-
+    lmList = []
     if hands:
         lmList = hands[0]['lmList']
         pointIndex = lmList[8][0:2]
         img = game.update(img, pointIndex)
     cv2.imshow("Image", img)
     pressedKey = cv2.waitKey(1) & 0xFF
+
+    tipsIDs = [4, 8, 12, 16, 20]
+    #check if fingertips are not up
+    openFingers = []
+    if len(lmList):
+        for id in tipsIDs:
+            if lmList[id][1] < lmList[id - 2][1]:
+                openFingers.append(1)
+
     if pressedKey == ord(' '):
+        game.score = 0
+        game.gameOver = False
+    elif game.gameOver and len(openFingers) == 5:
         game.score = 0
         game.gameOver = False
     elif pressedKey == ord('q'):

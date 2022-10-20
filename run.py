@@ -1,4 +1,6 @@
-
+# %%
+# from functools import cache, lru_cache
+from turtle import color
 from cvzone.HandTrackingModule import HandDetector
 import numpy as np
 import cv2
@@ -6,8 +8,10 @@ import cvzone
 import random
 import math
 
-# [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1920, 1080, 30]
+print("")
+
 CAMERA_PORT = 1  # 2 for external and 0 fo internal
+# [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1920, 1080, 30]
 [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1280, 720, 30]
 
 # Colour constants BGR not RGB
@@ -15,13 +19,11 @@ CAMERA_PORT = 1  # 2 for external and 0 fo internal
 # LINE_COLOR = (0, 0, 255) # Red in BGR
 # CIRCLE_COLOR = (255, 0, 0) # Blue in BGR
 
-# Color         (Blue, Green, Red)
-# Light Red     (33  , 28   , 206)
-# Light Blue    (189 , 192  , 38)
-# Light Green   (67  , 227  , 185)
-# Light Orange  (243 , 167  , 43)
-# White         (255 , 255  , 255)
-# Black         (0   , 0    , 0)
+# * Colors to try out
+# Light Red   (33,28,206)
+# Turquiose   (189,192,38)
+# Light Green (67, 227, 185)
+# Light Orange (243,167,43)
 
 POLYLINE_COLOR = (33, 28, 206)
 LINE_COLOR = (189, 192, 38)
@@ -40,7 +42,7 @@ def initialise_video_capture():
 
 initialise_video_capture()
 
-detector = HandDetector(detectionCon=0.8, maxHands=1)
+detector = HandDetector(detectionCon=0.8, maxHands=2)
 
 
 # %%
@@ -66,13 +68,31 @@ class SnakeGameClass:
     def update(self, imgMain, currentHead):
 
         if self.gameOver:
-            cvzone.putTextRect(imgMain, "Press SpaceBar to restart", [50, 80],
-                               scale=3, thickness=3, offset=10, colorT=TEXT_COLOR, colorR=TEXTBOX_COLOR)
+            cvzone.putTextRect(imgMain,
+                               "Press SpaceBar or Open Your Hand to restart",
+                               [50, 80],
+                               scale=3,
+                               thickness=3,
+                               offset=10,
+                               colorT=TEXT_COLOR,
+                               colorR=TEXTBOX_COLOR)
             # TODO add a GameOver tracking the finger
-            cvzone.putTextRect(imgMain, "Game Over", pos=[300, 400],
-                               scale=7, thickness=5, offset=20, colorT=TEXT_COLOR, colorR=TEXTBOX_COLOR)
-            cvzone.putTextRect(imgMain, f'Your Score: {self.score}', pos=[300, 550],
-                               scale=7, thickness=5, offset=20, colorT=TEXT_COLOR, colorR=TEXTBOX_COLOR)
+            cvzone.putTextRect(imgMain,
+                               "Game Over",
+                               pos=[300, 400],
+                               scale=7,
+                               thickness=5,
+                               offset=20,
+                               colorT=TEXT_COLOR,
+                               colorR=TEXTBOX_COLOR)
+            cvzone.putTextRect(imgMain,
+                               f'Your Score: {self.score}',
+                               pos=[300, 550],
+                               scale=7,
+                               thickness=5,
+                               offset=20,
+                               colorT=TEXT_COLOR,
+                               colorR=TEXTBOX_COLOR)
         else:
             px, py = self.previousHead
             cx, cy = currentHead
@@ -105,23 +125,31 @@ class SnakeGameClass:
             if self.points:
                 for i, point in enumerate(self.points):
                     if i != 0:
-                        cv2.line(
-                            imgMain, self.points[i - 1], self.points[i], LINE_COLOR, 20)
-                cv2.circle(imgMain, self.points[-1],
-                           20, CIRCLE_COLOR, cv2.FILLED)
+                        cv2.line(imgMain, self.points[i - 1], self.points[i],
+                                 LINE_COLOR, 20)
+                cv2.circle(imgMain, self.points[-1], 20, CIRCLE_COLOR,
+                           cv2.FILLED)
 
             # Draw Food
-            imgMain = cvzone.overlayPNG(imgMain, self.imgFood,
-                                        (rx - self.wFood // 2, ry - self.hFood // 2))
+            imgMain = cvzone.overlayPNG(
+                imgMain, self.imgFood,
+                (rx - self.wFood // 2, ry - self.hFood // 2))
 
-            cvzone.putTextRect(imgMain, f'Score: {self.score}', [50, 80],
-                               scale=3, thickness=3, offset=10, colorT=TEXT_COLOR, colorR=TEXTBOX_COLOR)
+            cvzone.putTextRect(imgMain,
+                               f'Score: {self.score}', [50, 80],
+                               scale=3,
+                               thickness=3,
+                               offset=10,
+                               colorT=TEXT_COLOR,
+                               colorR=TEXTBOX_COLOR)
 
             # Check for Collision
             pts = np.array(self.points[:-2], np.int32)
             pts = pts.reshape((-1, 1, 2))
-            cv2.polylines(imgMain, [pts], False,
-                          color=POLYLINE_COLOR, thickness=3)
+            cv2.polylines(imgMain, [pts],
+                          False,
+                          color=POLYLINE_COLOR,
+                          thickness=3)
             minDist = cv2.pointPolygonTest(pts, (cx, cy), True)
             if -1 <= minDist <= 1:
                 print("Hit")
@@ -139,7 +167,6 @@ class SnakeGameClass:
 #! NOTE: The image must be semi-transparent. A mask is required for the image.
 # * AKA no sqaure images only circle or other shapes
 
-
 FOOD_IMAGE = "eic.png"
 
 game = SnakeGameClass(FOOD_IMAGE)
@@ -152,14 +179,27 @@ while True:
     success, img = cap.read()
     img = cv2.flip(img, 1)
     hands, img = detector.findHands(img, flipType=False)
-
+    lmList = []
     if hands:
         lmList = hands[0]['lmList']
         pointIndex = lmList[8][0:2]
         img = game.update(img, pointIndex)
     cv2.imshow("Image", img)
     pressedKey = cv2.waitKey(1) & 0xFF
+
+    tipsIDs = [4, 8, 12, 16, 20]
+    #check if fingertips are not up
+    openFingers = []
+    if len(lmList):
+        for id in tipsIDs:
+            if lmList[id][1] < lmList[id - 2][1]:
+                openFingers.append(1)
+
     if pressedKey == ord(' '):
+        game.score = 0
+        game.gameOver = False
+    elif game.gameOver and len(openFingers) == 5:
+        game.score = 0
         game.gameOver = False
     elif pressedKey == ord('q'):
         print('\033[92m' + "The Game is quitting......" + '\033[0m')

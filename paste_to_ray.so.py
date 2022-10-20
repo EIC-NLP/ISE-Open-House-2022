@@ -8,9 +8,6 @@ import math
 
 print("")
 
-CAMERA_PORT = 1  # 2 for external and 0 fo internal
-# [X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1920, 1080, 30]
-[X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1280, 720, 30]
 
 # Colour constants BGR not RGB
 # POLYLINE_COLOR = (255, 255, 255)  # White line
@@ -23,11 +20,16 @@ CAMERA_PORT = 1  # 2 for external and 0 fo internal
 # Light Green (67, 227, 185)
 # Light Orange (243,167,43)
 
-POLYLINE_COLOR = (33, 28, 206)
-LINE_COLOR = (189, 192, 38)
-CIRCLE_COLOR = (67, 227, 185)
-TEXT_COLOR = (255, 255, 255)
-TEXTBOX_COLOR = (243, 167, 43)
+# Video capture configuration
+[X_RESOLUTION, Y_RESOLUTION, VIDEO_FPS] = [1280, 720, 30]
+CAMERA_PORT = 0
+
+# Theme color configuration
+POLYLINE_COLOR = (33, 28, 206)   # Light Red
+LINE_COLOR     = (189, 192, 38)  # Turquiose
+CIRCLE_COLOR   = (67, 227, 185)  # Light Green
+TEXT_COLOR     = (255, 255, 255) # White
+TEXTBOX_COLOR  = (243, 167, 43)  # Light Orange
 
 
 def initialise_video_capture():

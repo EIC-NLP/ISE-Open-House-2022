@@ -40,7 +40,7 @@ def initialise_video_capture():
 
 initialise_video_capture()
 
-detector = HandDetector(detectionCon=0.8, maxHands=2)
+detector = HandDetector(detectionCon=0.8, maxHands=1)
 
 
 # %%
